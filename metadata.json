@@ -1,0 +1,6 @@
+{
+  "name": "Propfutures.ai",
+  "description": "The ultimate premium prop firm and trader ecosystem with exclusive rewards and advanced analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
