@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Signal, 
   TrendingUp, 
@@ -14,10 +14,16 @@ import {
   TrendingDown,
   Timer,
   AlertTriangle,
-  Search
+  Search,
+  Calendar,
+  ArrowRight,
+  BrainCircuit,
+  Cpu,
+  Monitor
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useState } from 'react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const SIGNAL_DATA = [
   {
@@ -32,7 +38,8 @@ const SIGNAL_DATA = [
     winRate: '72%',
     time: '2m ago',
     confidence: 85,
-    category: 'Commodities'
+    category: 'COMMODITIES',
+    provider: 'Neural Apex'
   },
   {
     id: 2,
@@ -46,7 +53,8 @@ const SIGNAL_DATA = [
     winRate: '68%',
     time: '14m ago',
     confidence: 78,
-    category: 'Forex'
+    category: 'FOREX',
+    provider: 'Alpha Quantum'
   },
   {
     id: 3,
@@ -60,7 +68,8 @@ const SIGNAL_DATA = [
     winRate: '64%',
     time: '45m ago',
     confidence: 62,
-    category: 'Crypto'
+    category: 'CRYPTO',
+    provider: 'Bit Node'
   },
   {
     id: 4,
@@ -75,46 +84,27 @@ const SIGNAL_DATA = [
     winRate: '75%',
     time: '2h ago',
     profit: '+195 PIPS',
-    category: 'Forex'
-  },
-  {
-    id: 5,
-    pair: 'NAS100',
-    type: 'LONG',
-    entry: '18,540',
-    sl: '18,420',
-    tp: '18,850',
-    rr: '1:2.6',
-    status: 'ACTIVE',
-    winRate: '70%',
-    time: '1h ago',
-    confidence: 82,
-    category: 'Indices'
+    category: 'FOREX',
+    provider: 'London Core'
   }
 ];
 
-const PerformanceCard = ({ label, value, trend, icon: Icon, color }: any) => (
-  <div className="glass-dark p-8 rounded-[40px] border-white/5 relative overflow-hidden group">
-    <div className="absolute inset-0 bg-gradient-to-br from-brand-neon/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-    <div className="flex justify-between items-start mb-6">
-       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5", color)}>
-          <Icon size={28} />
-       </div>
-       <div className="flex items-center gap-1 text-[10px] font-bold text-brand-neon bg-brand-neon/10 px-3 py-1.5 rounded-full border border-brand-neon/20">
-          <ArrowUpRight size={14} /> {trend}
-       </div>
-    </div>
-    <div className="text-[9px] uppercase text-white/30 tracking-[0.3em] font-bold mb-2">{label}</div>
-    <div className="text-4xl font-display font-bold uppercase italic tracking-tighter">{value}</div>
-  </div>
-);
+const chartData = [
+  { time: '00:00', value: 2100 },
+  { time: '04:00', value: 2350 },
+  { time: '08:00', value: 2200 },
+  { time: '12:00', value: 2600 },
+  { time: '16:00', value: 2400 },
+  { time: '20:00', value: 2800 },
+];
 
 export default function Signals() {
   const [filter, setFilter] = useState('ALL');
+  const [activeSignal, setActiveSignal] = useState(SIGNAL_DATA[0]);
 
   const filteredSignals = filter === 'ALL' 
     ? SIGNAL_DATA 
-    : SIGNAL_DATA.filter(s => s.category.toUpperCase() === filter || s.status === filter);
+    : SIGNAL_DATA.filter(s => s.category === filter);
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-6">
@@ -125,68 +115,184 @@ export default function Signals() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-neon/10 rounded-lg mb-6 border border-brand-neon/20">
-              <Activity size={12} className="text-brand-neon animate-pulse" />
-              <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-brand-neon">Neural Node Active</span>
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-brand-neon/10 rounded-xl mb-6 border border-brand-neon/20">
+              <Activity size={14} className="text-brand-neon animate-pulse" />
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-brand-neon">Neural Node Active</span>
             </div>
-            <h1 className="text-6xl md:text-7xl font-display font-bold uppercase italic tracking-tighter leading-[0.8]">
-              Extraction <span className="text-brand-neon text-glow-neon">Delta.</span>
+            <h1 className="text-6xl md:text-8xl font-display font-bold uppercase italic tracking-tighter leading-[0.8] mb-8">
+              Extraction <br /> <span className="text-brand-neon text-glow-neon">Signals.</span>
             </h1>
-            <p className="text-xl text-white/40 mt-6 font-medium italic max-w-xl">
-              Real-time algorithmic stream from the PropFutures neural matrix. Synchronize your entries with elite alpha.
+            <p className="text-xl text-white/40 font-medium italic max-w-xl">
+              Real-time deep-learning algorithmic stream from the PropFutures neural layer. Synchronize your endpoints with hyper-liquidity nodes.
             </p>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex items-center gap-3 p-1.5 glass rounded-2xl bg-white/[0.02] border-white/5"
-          >
-             <button className="px-6 py-3 bg-brand-neon text-black rounded-xl text-[10px] font-bold uppercase tracking-widest neon-glow">Live Matrix</button>
-             <button className="px-6 py-3 text-white/30 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest">History Log</button>
-             <button className="px-6 py-3 text-white/30 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest">Provider Nodes</button>
-          </motion.div>
+          <div className="flex flex-col items-end gap-6">
+             <div className="flex gap-4">
+                <div className="glass p-5 rounded-3xl border-white/5 bg-black/40 text-center min-w-[120px]">
+                   <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-1">NODE_SUCCESS</div>
+                   <div className="text-2xl font-mono font-bold text-brand-neon">74.2%</div>
+                </div>
+                <div className="glass p-5 rounded-3xl border-white/5 bg-black/40 text-center min-w-[120px]">
+                   <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-1">TOTAL_PIPS</div>
+                   <div className="text-2xl font-mono font-bold text-white">12,402</div>
+                </div>
+             </div>
+          </div>
         </div>
 
-        {/* Performance Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-           <PerformanceCard label="Network Win-Rate" value="74.2%" trend="+4.2%" icon={Target} color="text-brand-neon" />
-           <PerformanceCard label="PIP Extraction" value="12,402" trend="+850" icon={TrendingUp} color="text-brand-cyan" />
-           <PerformanceCard label="Risk-Node Ratio" value="1:2.4" trend="+0.2" icon={ShieldCheck} color="text-white" />
-           <PerformanceCard label="Active Syncs" value="482" trend="+12" icon={Zap} color="text-brand-neon" />
-        </div>
+        {/* Main Interface */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-32">
+           {/* Active Intelligence Panel */}
+           <div className="lg:col-span-8 space-y-10">
+              <div className="glass-dark p-12 rounded-[56px] border border-white/5 bg-black/60 relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:opacity-[0.08] transition-all duration-1000">
+                    <BrainCircuit size={300} />
+                 </div>
+                 
+                 <div className="flex justify-between items-center mb-12 relative z-10">
+                    <div>
+                        <div className="text-[10px] text-brand-neon font-black uppercase tracking-[0.4em] mb-2 italic">Active_Alpha_Analysis</div>
+                        <h3 className="text-4xl font-display font-bold uppercase italic tracking-tighter">Extraction <span className="text-brand-neon">Matrix</span></h3>
+                    </div>
+                    <div className="flex gap-4">
+                       <span className="px-5 py-2 glass rounded-xl text-[10px] font-bold text-white/40 uppercase tracking-widest border-white/5">H1 Timeline</span>
+                    </div>
+                 </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4 mb-12">
-           <div className="p-1 glass rounded-2xl flex items-center gap-1">
-              {['ALL', 'FOREX', 'COMMODITIES', 'CRYPTO', 'INDICES'].map((f) => (
-                <button 
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={cn(
-                    "px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-[0.2em] transition-all",
-                    filter === f ? "bg-brand-neon text-black neon-glow" : "text-white/30 hover:bg-white/5 hover:text-white"
-                  )}
-                >
-                  {f}
-                </button>
-              ))}
+                 <div className="h-[300px] w-full mb-12 relative z-10">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData}>
+                        <defs>
+                          <linearGradient id="neonGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#C6FF00" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#C6FF00" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <Tooltip 
+                           contentStyle={{ backgroundColor: '#050505', border: '1px solid rgba(198,255,0,0.2)', borderRadius: '16px', color: '#C6FF00' }}
+                           itemStyle={{ color: '#C6FF00' }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke="#C6FF00" 
+                          strokeWidth={4} 
+                          fillOpacity={1} 
+                          fill="url(#neonGradient)" 
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                 </div>
+
+                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                    {[
+                      { label: 'Pair', value: activeSignal.pair },
+                      { label: 'Logic', value: activeSignal.type, color: activeSignal.type === 'LONG' ? 'text-brand-neon' : 'text-red-500' },
+                      { label: 'Confidence', value: `${activeSignal.confidence}%`, color: 'text-brand-neon' },
+                      { label: 'Node Source', value: activeSignal.provider },
+                    ].map((m, k) => (
+                      <div key={k} className="p-6 glass rounded-3xl border-transparent hover:border-white/5 bg-white/[0.02]">
+                         <div className="text-[9px] text-white/20 font-bold uppercase tracking-widest mb-2">{m.label}</div>
+                         <div className={cn("text-lg font-display font-bold uppercase italic tracking-tight", m.color || 'text-white')}>{m.value}</div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 {[
+                   { label: 'Total Extractions', val: '1,402', icon: Activity },
+                   { label: 'Risk Metrics', val: 'Low Threshold', icon: ShieldCheck },
+                   { label: 'System Payout Sync', val: 'Active', icon: Zap },
+                 ].map((s, j) => (
+                   <div key={j} className="glass p-8 rounded-[36px] flex items-center justify-between group hover:bg-brand-neon/[0.02] transition-colors border-white/5">
+                      <div>
+                         <div className="text-[9px] text-white/20 font-bold uppercase tracking-widest mb-1">{s.label}</div>
+                         <div className="text-xl font-display font-bold uppercase italic tracking-tighter text-white group-hover:text-brand-neon transition-colors">{s.val}</div>
+                      </div>
+                      <s.icon size={24} className="text-white/10 group-hover:text-brand-neon transition-colors" />
+                   </div>
+                 ))}
+              </div>
            </div>
-           <div className="ml-auto flex items-center gap-4">
-              <button className="p-4 glass rounded-2xl text-white/30 hover:text-brand-neon transition-colors border-white/5"><Filter size={20}/></button>
-              <div className="relative">
-                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
-                 <input 
-                  type="text" 
-                  placeholder="SEARCH_DELTA..." 
-                  className="bg-white/5 border border-white/5 rounded-2xl py-4 pl-12 pr-6 w-64 focus:outline-none focus:border-brand-neon transition-all text-[10px] font-bold font-mono tracking-widest text-brand-neon placeholder:text-white/10 uppercase italic"
-                 />
+
+           {/* Dashboard Summary / Quick Actions */}
+           <div className="lg:col-span-4 space-y-10">
+              <div className="glass-dark p-10 rounded-[56px] border border-white/5 bg-black/60 shadow-[0_40px_80px_rgba(0,0,0,0.6)] relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
+                    <Monitor size={120} />
+                 </div>
+                 <h4 className="text-xs font-black uppercase tracking-[0.3em] text-brand-neon mb-10 italic">Protocol Parameters</h4>
+                 
+                 <div className="space-y-8 mb-12">
+                    <div className="flex justify-between items-center bg-white/[0.03] p-6 rounded-3xl border border-white/5">
+                       <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Entry Limit Node</span>
+                       <span className="font-mono text-lg font-bold text-white">{activeSignal.entry}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-white/[0.03] p-6 rounded-3xl border border-white/5">
+                       <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Risk Termination</span>
+                       <span className="font-mono text-lg font-bold text-red-500">{activeSignal.sl}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-white/[0.03] p-6 rounded-3xl border border-white/5">
+                       <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Liquidity Goal</span>
+                       <span className="font-mono text-lg font-bold text-brand-neon">{activeSignal.tp}</span>
+                    </div>
+                 </div>
+
+                 <button className="w-full py-6 bg-brand-neon text-black rounded-[24px] font-black italic text-xs uppercase tracking-[0.4em] neon-glow hover:scale-[1.03] active:scale-95 transition-all shadow-[0_0_40px_rgba(198,255,0,0.2)]">
+                    Synchronize Core
+                 </button>
+              </div>
+
+              <div className="glass-dark p-10 rounded-[56px] border border-white/5 bg-black/60 shadow-[0_40px_80px_rgba(0,0,0,0.6)]">
+                 <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/60 italic">Neural Timeline</h3>
+                    <Calendar size={18} className="text-brand-neon" />
+                 </div>
+                 <div className="space-y-6">
+                    {[
+                      { event: 'USD_CPI_DATA', time: '14:30', impact: 'HIGH', color: 'text-red-500' },
+                      { event: 'EUR_ECB_SPEECH', time: '16:00', impact: 'MED', color: 'text-brand-cyan' },
+                      { event: 'XAU_SURGE', time: '18:15', impact: 'HIGH', color: 'text-red-500' },
+                    ].map((ev, i) => (
+                      <div key={i} className="flex items-center justify-between group">
+                         <div>
+                            <div className="text-[10px] font-bold text-white/60 uppercase tracking-widest group-hover:text-brand-neon transition-colors">{ev.event}</div>
+                            <div className="text-[9px] text-white/20 font-bold tracking-widest mt-1">{ev.time} UTC</div>
+                         </div>
+                         <span className={cn("text-[8px] font-black uppercase tracking-[0.2em] px-2 py-1 rounded-lg bg-white/5", ev.color)}>{ev.impact}</span>
+                      </div>
+                    ))}
+                 </div>
               </div>
            </div>
         </div>
 
-        {/* Signals Feed */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Global Signal Feed */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+           <div>
+              <h2 className="text-4xl font-display font-bold uppercase italic tracking-tighter">Live <span className="text-brand-neon">Registry.</span></h2>
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-[0.4em] mt-2 italic">Active synchronization across global clusters</p>
+        </div>
+           <div className="flex gap-2 p-1.5 glass rounded-2xl bg-white/[0.02] border-white/5">
+              {['ALL', 'FOREX', 'CRYPTO', 'COMMODITIES'].map(f => (
+                <button 
+                   key={f} 
+                   onClick={() => setFilter(f)}
+                   className={cn(
+                     "px-6 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all",
+                     filter === f ? "bg-brand-neon text-black neon-glow" : "text-white/20 hover:text-white"
+                   )}
+                >
+                   {f}
+                </button>
+              ))}
+           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-40">
            {filteredSignals.map((signal, i) => (
              <motion.div
                key={signal.id}
@@ -194,15 +300,15 @@ export default function Signals() {
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
                transition={{ delay: i * 0.1 }}
-               className="glass-dark p-10 rounded-[56px] border-white/5 relative group hover:border-brand-neon/30 transition-all duration-700 overflow-hidden"
+               onClick={() => setActiveSignal(signal)}
+               className={cn(
+                 "glass-dark p-10 rounded-[56px] border group cursor-pointer transition-all duration-700 overflow-hidden relative",
+                 activeSignal.id === signal.id ? "border-brand-neon/50 bg-brand-neon/[0.03] scale-[1.02]" : "border-white/5 bg-black/60 hover:border-brand-neon/30"
+               )}
              >
-                <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
-                   <Signal size={160}/>
-                </div>
-
                 <div className="flex justify-between items-start mb-10">
                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-white/[0.03] border border-white/5 rounded-3xl flex items-center justify-center neon-glow group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 bg-white/[0.03] border border-white/5 rounded-[24px] flex items-center justify-center neon-glow group-hover:scale-110 transition-transform">
                          <div className={cn(
                            "text-2xl font-bold font-display italic",
                            signal.type === 'LONG' ? "text-brand-neon" : "text-red-500"
@@ -211,106 +317,56 @@ export default function Signals() {
                          </div>
                       </div>
                       <div>
-                         <div className="flex items-center gap-3">
-                            <h3 className="text-3xl font-display font-bold italic tracking-tighter uppercase">{signal.pair}</h3>
+                         <h3 className="text-2xl font-display font-bold italic tracking-tighter uppercase">{signal.pair}</h3>
+                         <div className="flex items-center gap-3 mt-1">
                             <span className={cn(
-                              "px-3 py-1 rounded-lg text-[9px] font-black tracking-[0.2em] uppercase border",
+                              "text-[8px] font-black tracking-[0.2em] uppercase px-2 py-1 rounded-lg border",
                               signal.type === 'LONG' ? "text-brand-neon border-brand-neon/20 bg-brand-neon/5" : "text-red-500 border-red-500/20 bg-red-500/5"
                             )}>
                                {signal.type} NODE
                             </span>
-                         </div>
-                         <div className="flex items-center gap-4 mt-2">
-                           <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest flex items-center gap-2">
-                              <Clock size={12} /> {signal.time}
-                           </span>
-                           <span className="text-[10px] text-brand-cyan font-bold uppercase tracking-widest">{signal.category} CLUSTER</span>
+                            <span className="text-[9px] text-white/30 font-bold uppercase tracking-widest">{signal.time}</span>
                          </div>
                       </div>
                    </div>
-                   <div className="text-right">
-                      <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-1">Confidence Score</div>
-                      <div className="text-2xl font-display font-bold text-brand-neon italic">{signal.confidence || signal.result}%</div>
+                </div>
+
+                <div className="space-y-4 mb-10">
+                   <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                      <span className="text-white/20">Win Integrity</span>
+                      <span className="text-brand-cyan">{signal.winRate}</span>
+                   </div>
+                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-brand-neon/40" style={{ width: signal.winRate }} />
                    </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-6 mb-10">
-                   {[
-                     { label: 'Entry Gateway', value: signal.entry, color: 'text-white' },
-                     { label: 'Stop Termination', value: signal.sl, color: 'text-red-500' },
-                     { label: 'Profit Extraction', value: signal.tp, color: 'text-brand-neon' },
-                   ].map((item, j) => (
-                     <div key={j} className="glass p-6 rounded-[28px] border-white/5 bg-white/[0.02]">
-                        <div className="text-[8px] text-white/20 uppercase font-black tracking-[0.2em] mb-2">{item.label}</div>
-                        <div className={cn("text-lg font-mono font-bold tracking-tighter", item.color)}>{item.value}</div>
-                     </div>
-                   ))}
-                </div>
-
-                <div className="flex items-center justify-between pb-8 border-b border-white/5 mb-8">
-                   <div className="flex items-center gap-8">
-                      <div>
-                         <div className="text-[9px] text-white/20 font-bold uppercase tracking-widest mb-1">RR Ratio</div>
-                         <div className="text-sm font-mono font-bold text-white/60">{signal.rr}</div>
-                      </div>
-                      <div>
-                         <div className="text-[9px] text-white/20 font-bold uppercase tracking-widest mb-1">Win Rate</div>
-                         <div className="text-sm font-mono font-bold text-brand-cyan">{signal.winRate}</div>
-                      </div>
-                   </div>
-                   <div className="flex -space-x-3">
-                      {[1, 2, 3].map((u) => (
-                        <div key={u} className="w-8 h-8 rounded-full border-2 border-black bg-white/5 overflow-hidden">
-                           <img src={`https://i.pravatar.cc/100?img=${u + 10}`} alt="user" className="w-full h-full object-cover grayscale opacity-50" />
-                        </div>
-                      ))}
-                      <div className="w-8 h-8 rounded-full border-2 border-black bg-brand-neon text-black flex items-center justify-center text-[8px] font-black">+42</div>
-                   </div>
-                </div>
-
-                <div className="flex gap-4">
-                   <button className="flex-grow py-5 bg-black border border-brand-neon/30 text-brand-neon rounded-2xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-neon hover:text-black transition-all neon-glow flex items-center justify-center gap-3 group">
-                      Synchronize with MetaNode <Zap size={16} className="group-hover:animate-pulse" />
-                   </button>
-                   <button className="w-16 h-16 glass rounded-2xl flex items-center justify-center hover:bg-white/5 transition-all text-white/30 hover:text-white border-white/5">
-                      <BarChart3 size={24} />
-                   </button>
-                </div>
-
-                {signal.status === 'CLOSED' && (
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-20">
-                     <div className="bg-black/80 border border-brand-neon/30 px-10 py-6 rounded-3xl neon-glow">
-                        <div className="text-[10px] text-white/40 font-bold uppercase tracking-[0.4em] mb-2 text-center">Extraction Finalized</div>
-                        <div className="text-4xl font-display font-bold text-brand-neon italic tracking-tighter uppercase">{signal.profit} EXTRACTION</div>
-                     </div>
-                  </div>
-                )}
+                <button className="w-full py-5 glass border-white/5 group-hover:border-brand-neon/30 text-white/40 group-hover:text-brand-neon rounded-2xl text-[9px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3">
+                   Analyze Logic <ArrowRight size={14} className="transition-transform group-hover:translate-x-2" />
+                </button>
              </motion.div>
            ))}
         </div>
 
-        {/* Training CTA */}
+        {/* Training Base CTA */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-32 p-12 md:p-20 rounded-[56px] glass-dark border-brand-neon/20 relative overflow-hidden group shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)]"
+           className="relative glass-dark p-20 rounded-[80px] border border-white/5 bg-black/60 overflow-hidden text-center"
         >
-           <div className="absolute top-0 right-0 p-12 opacity-[0.05] pointer-events-none group-hover:scale-110 transition-transform duration-1000">
-              <Timer size={300} className="text-brand-neon" />
-           </div>
-           
-           <div className="max-w-2xl relative z-10">
-              <div className="text-brand-neon text-[10px] font-bold uppercase tracking-[0.4em] mb-6">Neural Training Base</div>
-              <h2 className="text-4xl md:text-5xl font-display font-bold uppercase italic tracking-tighter mb-8 leading-[0.9]">
-                 Learn to Extract <br /> <span className="text-brand-neon text-glow-neon">Delta Manually.</span>
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(198,255,0,0.05)_0%,_transparent_70%)]" />
+           <div className="relative z-10 max-w-2xl mx-auto">
+              <div className="inline-flex items-center gap-3 px-4 py-2 glass rounded-xl mb-10 border-brand-neon/30">
+                 <ShieldCheck size={14} className="text-brand-neon" />
+                 <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-brand-neon">Neural Mastery Registry</span>
+              </div>
+              <h2 className="text-5xl md:text-7xl font-display font-bold uppercase italic tracking-tighter mb-10 leading-[0.9]">
+                 Evolve your <br /> <span className="text-brand-neon underline italic">Extraction Rank.</span>
               </h2>
-              <p className="text-lg text-white/40 font-medium uppercase tracking-tight mb-12">
-                 Join the elite node operators. Master the PROP_FUTURES.AI protocol for manual delta extraction across global liqudity clusters.
+              <p className="text-lg text-white/40 font-medium uppercase tracking-tight mb-16 px-10">
+                Join our elite node training program and master the PropFutures manual extraction protocol.
               </p>
-              <div className="flex flex-col sm:flex-row gap-6">
-                 <button className="px-10 py-5 bg-brand-neon text-black rounded-2xl font-bold uppercase tracking-widest text-[10px] neon-glow hover:scale-[1.03] transition-all">Enroll Initial Rank</button>
-                 <button className="px-10 py-5 glass rounded-2xl font-bold uppercase tracking-widest text-[10px] border-white/5">Analyze Strategy Matrix</button>
+              <div className="flex flex-col sm:flex-row justify-center gap-8">
+                 <button className="px-16 py-6 bg-brand-neon text-black rounded-3xl font-black italic uppercase tracking-[0.3em] text-[11px] neon-glow">Initialize Rank 0</button>
+                 <button className="px-16 py-6 glass border-white/5 text-white/60 hover:text-white rounded-3xl font-black uppercase tracking-[0.3em] text-[11px]">Audit Logic Docs</button>
               </div>
            </div>
         </motion.div>

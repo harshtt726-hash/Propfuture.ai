@@ -18,22 +18,23 @@ import {
   PieChart,
   DollarSign,
   MessageSquare,
-  Trophy
+  Trophy,
+  Activity
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: 'Ecosystem Matrix', path: '/admin/dashboard' },
-  { icon: Users, label: 'Neural Nodes', path: '/admin/users' },
-  { icon: ShieldCheck, label: 'Protocol Partners', path: '/admin/firms' },
-  { icon: CreditCard, label: 'Delta Extractions', path: '/admin/purchases' },
-  { icon: DollarSign, label: 'Liquidity Sync', path: '/admin/payouts' },
-  { icon: Gift, label: 'Quantum Bounties', path: '/admin/rewards' },
-  { icon: Trophy, label: 'Leaderboard Kernels', path: '/admin/leaderboards' },
-  { icon: MessageSquare, label: 'Neural Clusters', path: '/admin/discord' },
-  { icon: PieChart, label: 'Neuro Analytics', path: '/admin/analytics' },
-  { icon: MessageSquare, label: 'Nexus Support', path: '/admin/support' },
-  { icon: Settings, label: 'Kernel Config', path: '/admin/settings' },
+  { icon: LayoutDashboard, label: 'Ecosystem Matrix', path: '/admin/dashboard', isExternal: false },
+  { icon: Users, label: 'Neural Nodes', path: '/admin/users', isExternal: false },
+  { icon: ShieldCheck, label: 'Protocol Partners', path: '/admin/firms', isExternal: false },
+  { icon: CreditCard, label: 'Delta Extractions', path: '/admin/purchases', isExternal: false },
+  { icon: DollarSign, label: 'Liquidity Sync', path: '/admin/payouts', isExternal: false },
+  { icon: Gift, label: 'Quantum Bounties', path: '/admin/rewards', isExternal: false },
+  { icon: Trophy, label: 'Leaderboard Kernels', path: '/admin/leaderboards', isExternal: false },
+  { icon: MessageSquare, label: 'Neural Clusters', path: '/admin/discord', isExternal: false },
+  { icon: PieChart, label: 'Neuro Analytics', path: '/admin/analytics', isExternal: false },
+  { icon: MessageSquare, label: 'Nexus Support', path: '/admin/support', isExternal: false },
+  { icon: Settings, label: 'Kernel Config', path: '/admin/settings', isExternal: false },
 ];
 
 export default function AdminLayout() {
@@ -42,10 +43,15 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const sidebarItemsWithHome = [
+    { icon: TrendingUp, label: 'Live Platform', path: '/', isExternal: true },
+    ...sidebarItems
+  ];
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex min-h-screen bg-[#020202] text-white selection:bg-brand-neon/30 selection:text-brand-neon">
+    <div className="flex min-h-screen bg-[#020202] text-white selection:bg-brand-neon/30 selection:text-brand-neon font-sans">
       {/* Sidebar - Desktop */}
       <motion.aside 
         initial={false}
@@ -55,7 +61,7 @@ export default function AdminLayout() {
         <div className="p-8 flex items-center justify-between">
           <Link to="/admin" className={cn("flex items-center gap-3 overflow-hidden whitespace-nowrap", !isSidebarOpen && "justify-center")}>
             <div className="w-12 h-12 bg-black border border-brand-neon/20 rounded-xl flex items-center justify-center flex-shrink-0 neon-glow">
-              <TrendingUp className="text-brand-neon" size={24} />
+              <Activity className="text-brand-neon" size={24} />
             </div>
             {isSidebarOpen && (
               <div className="flex flex-col">
@@ -69,7 +75,7 @@ export default function AdminLayout() {
         </div>
 
         <nav className="flex-grow px-4 space-y-1.5 mt-6 scrollbar-hide overflow-y-auto">
-          {sidebarItems.map((item) => (
+          {sidebarItemsWithHome.map((item) => (
             <Link 
               key={item.path}
               to={item.path}
@@ -80,8 +86,11 @@ export default function AdminLayout() {
                   : "text-white/30 hover:bg-white/[0.03] hover:text-white/80"
               )}
             >
-              <item.icon size={22} className={cn("flex-shrink-0 transition-colors", location.pathname === item.path ? "text-brand-neon" : "group-hover:text-brand-neon")} />
-              {isSidebarOpen && <span className="font-bold text-[11px] uppercase tracking-[0.2em]">{item.label}</span>}
+              <item.icon size={22} className={cn("flex-shrink-0 transition-colors", 
+                location.pathname === item.path ? "text-brand-neon" : "group-hover:text-brand-neon",
+                item.isExternal && "text-brand-cyan group-hover:text-brand-cyan"
+              )} />
+              {isSidebarOpen && <span className={cn("font-bold text-[11px] uppercase tracking-[0.2em]", item.isExternal && "text-brand-cyan")}>{item.label}</span>}
               {!isSidebarOpen && (
                 <div className="absolute left-full ml-6 px-4 py-3 bg-[#0a0a0a] border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-2xl">
                   {item.label}
@@ -89,6 +98,11 @@ export default function AdminLayout() {
               )}
               {location.pathname === item.path && isSidebarOpen && (
                 <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-brand-neon neon-glow animate-pulse" />
+              )}
+              {item.isExternal && isSidebarOpen && (
+                <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                   <ChevronRight size={14} className="text-brand-cyan" />
+                </div>
               )}
             </Link>
           ))}
@@ -196,7 +210,7 @@ export default function AdminLayout() {
                 </button>
               </div>
               <nav className="flex-grow p-6 space-y-2 overflow-y-auto">
-                {sidebarItems.map((item) => (
+                {sidebarItemsWithHome.map((item) => (
                   <Link 
                     key={item.path}
                     to={item.path}
@@ -208,8 +222,8 @@ export default function AdminLayout() {
                         : "text-white/30 hover:bg-white/[0.03]"
                     )}
                   >
-                    <item.icon size={22} />
-                    <span className="font-bold text-xs uppercase tracking-widest">{item.label}</span>
+                    <item.icon size={22} className={item.isExternal ? "text-brand-cyan" : ""} />
+                    <span className={cn("font-bold text-xs uppercase tracking-widest", item.isExternal && "text-brand-cyan")}>{item.label}</span>
                   </Link>
                 ))}
               </nav>

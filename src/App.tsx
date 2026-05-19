@@ -30,7 +30,8 @@ import {
   Settings,
   CreditCard,
   Target,
-  Signal
+  Signal,
+  ShoppingBag
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from './lib/utils';
@@ -43,6 +44,9 @@ import Dashboard from './pages/Dashboard';
 import Rewards from './pages/Rewards';
 import Community from './pages/Community';
 import Auth from './pages/Auth';
+
+import Marketplace from './pages/Marketplace';
+import CompareFirms from './pages/CompareFirms';
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin';
@@ -78,65 +82,82 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Firms', path: '/firms', icon: ShieldCheck },
     { name: 'Signals', path: '/signals', icon: Signal },
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Marketplace', path: '/marketplace', icon: ShoppingBag },
     { name: 'Rewards', path: '/rewards', icon: Gift },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Compare', path: '/compare', icon: ArrowUpRight },
     { name: 'Community', path: '/community', icon: MessageSquare },
   ];
 
   return (
     <nav className={cn(
-      "fixed top-10 left-0 right-0 z-50 transition-all duration-300 px-6",
-      isScrolled ? "mt-[-40px]" : ""
+      "fixed top-8 left-0 right-0 z-50 transition-all duration-500 px-6",
+      isScrolled ? "top-4" : ""
     )}>
       <div className={cn(
-        "max-w-7xl mx-auto flex items-center justify-between px-8 py-3 rounded-2xl transition-all duration-300",
-        isScrolled ? "bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" : "bg-transparent"
+        "max-w-[1400px] mx-auto flex items-center justify-between px-8 py-3 rounded-[24px] transition-all duration-500 relative group",
+        isScrolled 
+          ? "bg-black/60 backdrop-blur-2xl border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.8)]" 
+          : "bg-black/20 backdrop-blur-md border border-white/5"
       )}>
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10">
-            <div className="absolute inset-0 bg-brand-neon rounded-lg blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-            <div className="relative w-10 h-10 bg-black border border-white/10 rounded-xl flex items-center justify-center overflow-hidden group-hover:border-brand-neon/50 transition-colors">
-              <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-brand-neon/20 to-brand-cyan/20" />
-              <TrendingUp className="text-brand-neon relative z-10" size={20} />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-neon/5 via-transparent to-brand-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-[24px] pointer-events-none" />
+        
+        <Link to="/" className="flex items-center gap-4 group/logo relative z-10 transition-transform active:scale-95">
+          <div className="relative w-11 h-11">
+            <div className="absolute inset-0 bg-brand-neon rounded-xl blur-xl opacity-20 group-hover/logo:opacity-50 transition-opacity" />
+            <div className="relative w-11 h-11 bg-black border border-white/10 rounded-2xl flex items-center justify-center overflow-hidden group-hover/logo:border-brand-neon/50 transition-all duration-500 group-hover/logo:rotate-[5deg]">
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-neon/20 to-brand-cyan/20" />
+              <TrendingUp className="text-brand-neon relative z-10" size={22} />
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-display font-bold tracking-tighter leading-none italic">
+            <span className="text-2xl font-display font-bold tracking-tighter leading-none italic uppercase">
               PROP<span className="text-brand-neon">FUTURES</span>
             </span>
-            <span className="text-[10px] font-bold text-white/30 tracking-[0.3em] uppercase leading-none mt-1">.AI ECOSYSTEM</span>
+            <span className="text-[9px] font-black text-brand-neon/50 tracking-[0.4em] uppercase leading-none mt-1.5 italic">NEURAL_ECOSYSTEM_V4</span>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <Link 
               key={link.path} 
               to={link.path}
               className={cn(
-                "text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-brand-neon relative group",
-                location.pathname === link.path ? "text-brand-neon" : "text-white/50"
+                "px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative group flex flex-col items-center gap-1 hover:text-white",
+                location.pathname === link.path ? "text-brand-neon" : "text-white/40"
               )}
             >
-              {link.name}
-              <div className={cn(
-                "absolute -bottom-1 left-0 h-[1px] bg-brand-neon transition-all duration-300",
-                location.pathname === link.path ? "w-full" : "w-0 group-hover:w-full"
-              )} />
+              <span className="relative z-10">{link.name}</span>
+              <motion.div 
+                layoutId="nav-glow"
+                className={cn(
+                  "absolute inset-0 bg-white/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity",
+                  location.pathname === link.path && "opacity-100 bg-brand-neon/10"
+                )} 
+              />
+              {location.pathname === link.path && (
+                <motion.div 
+                  layoutId="nav-underline"
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-brand-neon rounded-full neon-glow"
+                />
+              )}
             </Link>
           ))}
-          <div className="h-4 w-px bg-white/10 mx-2" />
-          <Link to="/auth" className="relative group overflow-hidden px-8 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">
-            <div className="absolute inset-0 bg-brand-neon opacity-10 group-hover:opacity-20 transition-opacity" />
-            <div className="absolute inset-x-0 bottom-0 h-[2px] bg-brand-neon shadow-[0_0_10px_rgba(198,255,0,0.5)]" />
-            <span className="relative z-10">Neural Login</span>
+        </div>
+
+        <div className="hidden lg:flex items-center gap-6 relative z-10">
+          <div className="h-4 w-px bg-white/10" />
+          <Link to="/auth" className="group relative px-10 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-[0.25em] transition-all overflow-hidden italic">
+            <div className="absolute inset-0 bg-brand-neon neon-glow group-hover:scale-105 transition-transform" />
+            <span className="relative z-10 text-black">Neural Login</span>
           </Link>
         </div>
 
         {/* Mobile Toggle */}
-        <button className="md:hidden text-white" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          {isMobileMenuOpen ? <X /> : <Menu />}
+        <button className="lg:hidden text-white/50 hover:text-brand-neon transition-colors p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
@@ -144,24 +165,32 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-0 right-0 glass-dark border-t border-white/10 p-6 flex flex-col gap-4 md:hidden"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="absolute top-[calc(100%+16px)] left-6 right-6 glass-dark border border-white/10 p-8 rounded-[40px] lg:hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)] z-[100]"
           >
-            {navLinks.map((link) => (
-              <Link 
-                key={link.path} 
-                to={link.path} 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-lg font-medium p-3 rounded-xl hover:bg-white/5"
-              >
-                <link.icon size={20} />
-                {link.name}
-              </Link>
-            ))}
-            <Link to="/auth" className="bg-brand-blue text-center py-4 rounded-xl font-bold mt-4" onClick={() => setIsMobileMenuOpen(false)}>
-              Get Started
+            <div className="grid grid-cols-2 gap-4">
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.path} 
+                  to={link.path} 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "flex flex-col items-center gap-3 p-6 rounded-3xl transition-all border",
+                    location.pathname === link.path 
+                      ? "bg-brand-neon/10 border-brand-neon/20 text-brand-neon" 
+                      : "bg-white/5 border-white/5 text-white/40"
+                  )}
+                >
+                  <link.icon size={24} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{link.name}</span>
+                </Link>
+              ))}
+            </div>
+            <Link to="/auth" className="flex items-center justify-center gap-3 bg-brand-neon text-black py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] mt-6 italic neon-glow" onClick={() => setIsMobileMenuOpen(false)}>
+              Portal Access <ChevronRight size={18} />
             </Link>
           </motion.div>
         )}
@@ -273,9 +302,11 @@ export default function App() {
                     } />
                     <Route path="/firms" element={<PropFirms />} />
                     <Route path="/signals" element={<Signals />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/marketplace" element={<Marketplace />} />
                     <Route path="/rewards" element={<Rewards />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/community" element={<Community />} />
+                    <Route path="/compare" element={<CompareFirms />} />
                     <Route path="/auth" element={<Auth />} />
                   </Routes>
                 </AnimatePresence>
