@@ -31,13 +31,58 @@ const RewardCard = ({ title, desc, value, type, icon: Icon, color, cost }: { tit
   </div>
 );
 
+import { stateService } from '../lib/stateService';
+
 export default function Rewards() {
-  const items = [
-    { title: 'Neural Ledger v2', desc: 'Secure your ecosystem earnings on-chain.', value: '$250', type: 'HARDWARE', icon: Cpu, color: 'bg-brand-neon', cost: '12,500 XP' },
-    { title: 'TradingView Pro', desc: 'Advanced quantum charting algorithms.', value: '$60', type: 'LICENSE', icon: Tv, color: 'bg-brand-cyan', cost: 'FREE' },
-    { title: 'Apex Delta Pass', desc: '80% discount on any elite challenge.', value: '$400', type: 'NETWORK', icon: Zap, color: 'bg-brand-neon', cost: '5,000 XP' },
-    { title: 'Cyber-Trade Station', desc: 'Extreme performance hardware setup.', value: '$4,200', type: 'SYSTEM', icon: Monitor, color: 'bg-white', cost: '150,000 XP' },
-  ];
+  const dynamicRewards = stateService.getRewards().map((r, idx) => {
+    let desc = 'Initiate redemption of the premium cluster node.';
+    let value = 'Limited Cluster Stock';
+    let icon = Cpu;
+    let color = 'bg-brand-neon';
+
+    if (r.title.toLowerCase().includes('ledger')) {
+      desc = 'Secure your ecosystem earnings on-chain.';
+      value = '$250';
+      icon = Cpu;
+      color = 'bg-brand-neon';
+    } else if (r.title.toLowerCase().includes('tradingview')) {
+      desc = 'Advanced quantum charting algorithms.';
+      value = '$60';
+      icon = Tv;
+      color = 'bg-brand-cyan';
+    } else if (r.title.toLowerCase().includes('apex') || r.title.toLowerCase().includes('pass')) {
+      desc = '80% discount on any elite challenge.';
+      value = '$400';
+      icon = Zap;
+      color = 'bg-brand-neon';
+    } else if (r.title.toLowerCase().includes('cyber') || r.title.toLowerCase().includes('station')) {
+      desc = 'Extreme performance hardware setup.';
+      value = '$4,200';
+      icon = Monitor;
+      color = 'bg-white';
+    } else {
+      desc = `Premium redemption node under ${r.category || 'Loyalty'} core.`;
+      value = r.qty ? `${r.qty} left in stock` : 'LIMITED STOCK';
+      icon = idx % 2 === 0 ? Cpu : Zap;
+      color = 'bg-brand-cyan';
+    }
+
+    const priceLabel = String(r.cost).toUpperCase().includes('FREE') || r.cost === 0
+      ? 'FREE'
+      : `${Number(r.cost).toLocaleString()} XP`;
+
+    return {
+      title: r.title,
+      desc,
+      value,
+      type: (r.category || 'LOYALTY_PASS').toUpperCase(),
+      icon,
+      color,
+      cost: priceLabel
+    };
+  });
+
+  const items = dynamicRewards;
 
   return (
     <motion.div 

@@ -2,15 +2,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 import { Search, Filter, ShieldCheck, Star, ArrowRight, Zap, Info, Clock, CheckCircle2, TrendingUp, Sparkles, BrainCircuit, X } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { stateService } from '../lib/stateService';
 
-const FIRMS = [
-  { id: 1, name: 'Apex Trader', category: 'Futures', discount: '20%', speed: 'Instant', trust: 9.8, rating: 4.9, active: true, xp: '2.5x' },
-  { id: 2, name: 'Funding Pips', category: 'Forex', discount: '15%', speed: '24h', trust: 9.5, rating: 4.8, active: true, xp: '1.8x' },
-  { id: 3, name: 'FTMO', category: 'Forex', discount: '10%', speed: 'Same Day', trust: 9.9, rating: 5.0, active: true, xp: '1.2x' },
-  { id: 4, name: 'Topstep', category: 'Futures', discount: '5%', speed: 'Instant', trust: 9.7, rating: 4.7, active: true, xp: '1.5x' },
-  { id: 5, name: 'The5ers', category: 'Forex', discount: '12%', speed: '48h', trust: 9.2, rating: 4.5, active: false, xp: '1.0x' },
-  { id: 6, name: 'Bulenox', category: 'Futures', discount: '80%', speed: '24h', trust: 8.5, rating: 4.2, active: true, xp: '3.0x' },
-];
 
 const FirmModal = ({ firm, onClose }: { firm: any, onClose: () => void }) => (
   <motion.div 
@@ -99,7 +92,9 @@ export default function PropFirms() {
 
   const categories = ['All', 'Forex', 'Futures', 'Swing', 'Aggressive'];
 
-  const filteredFirms = FIRMS.filter(f => 
+  const firmsList = stateService.getFirms();
+
+  const filteredFirms = firmsList.filter(f => 
     (filter === 'All' || f.category === filter) &&
     f.name.toLowerCase().includes(search.toLowerCase())
   );

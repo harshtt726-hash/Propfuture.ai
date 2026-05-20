@@ -17,17 +17,23 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../lib/utils';
-
-const FIRMS = [
-  { id: 1, name: 'Apex Trader', funding: '$50k - $300k', profit: '90%', drawdown: 'Trailing', rules: 'Day-Trade only', fee: '$147', trust: 9.8, logo: 'A' },
-  { id: 2, name: 'Funding Pips', funding: '$5k - $100k', profit: '80%', drawdown: 'Fixed', rules: 'No restrictions', fee: '$32', trust: 9.5, logo: 'F' },
-  { id: 3, name: 'FTMO', funding: '$10k - $200k', profit: '80%+', drawdown: 'Max Daily', rules: 'High frequency allowed', fee: '€155', trust: 9.9, logo: 'F' },
-  { id: 4, name: 'E8 Funding', funding: '$25k - $250k', profit: '80%', drawdown: 'Relative', rules: 'Swing allowed', fee: '$138', trust: 9.4, logo: 'E' },
-];
+import { stateService } from '../lib/stateService';
 
 export default function CompareFirms() {
   const [selectedFirms, setSelectedFirms] = useState<any[]>([]);
   const [search, setSearch] = useState('');
+
+  const firmsList = stateService.getFirms().map(f => ({
+    id: f.id,
+    name: f.name,
+    funding: f.phaseNodes === 'INSTANT_FUNDED' ? '$10k - $100k' : '$50k - $300k',
+    profit: f.profitSplit || '80%',
+    drawdown: `${f.dailyDrawdown || '5%'} / ${f.totalDrawdown || '10%'}`,
+    rules: f.restrictionsMatrix || 'No Copy Trading',
+    fee: f.id === 1 ? '$147' : f.id === 2 ? '$32' : f.id === 3 ? '€155' : '$138',
+    trust: f.trust,
+    logo: f.name[0]
+  }));
 
   const toggleFirm = (firm: any) => {
     if (selectedFirms.find(f => f.id === firm.id)) {
@@ -38,7 +44,7 @@ export default function CompareFirms() {
     }
   };
 
-  const filteredFirms = FIRMS.filter(f => 
+  const filteredFirms = firmsList.filter(f => 
     f.name.toLowerCase().includes(search.toLowerCase()) && 
     !selectedFirms.find(sf => sf.id === f.id)
   );

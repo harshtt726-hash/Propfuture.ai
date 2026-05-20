@@ -24,70 +24,7 @@ import {
 import { cn } from '../lib/utils';
 import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-const SIGNAL_DATA = [
-  {
-    id: 1,
-    pair: 'XAU/USD',
-    type: 'LONG',
-    entry: '2342.10',
-    sl: '2331.00',
-    tp: '2368.50',
-    rr: '1:2.5',
-    status: 'ACTIVE',
-    winRate: '72%',
-    time: '2m ago',
-    confidence: 85,
-    category: 'COMMODITIES',
-    provider: 'Neural Apex'
-  },
-  {
-    id: 2,
-    pair: 'EUR/USD',
-    type: 'SHORT',
-    entry: '1.08420',
-    sl: '1.08650',
-    tp: '1.07950',
-    rr: '1:2.1',
-    status: 'ACTIVE',
-    winRate: '68%',
-    time: '14m ago',
-    confidence: 78,
-    category: 'FOREX',
-    provider: 'Alpha Quantum'
-  },
-  {
-    id: 3,
-    pair: 'BTC/USD',
-    type: 'LONG',
-    entry: '66,240',
-    sl: '65,400',
-    tp: '68,200',
-    rr: '1:1.8',
-    status: 'PENDING',
-    winRate: '64%',
-    time: '45m ago',
-    confidence: 62,
-    category: 'CRYPTO',
-    provider: 'Bit Node'
-  },
-  {
-    id: 4,
-    pair: 'GBP/JPY',
-    type: 'SHORT',
-    entry: '192.450',
-    sl: '193.100',
-    tp: '190.500',
-    rr: '1:3.0',
-    status: 'CLOSED',
-    result: 'HIT TP',
-    winRate: '75%',
-    time: '2h ago',
-    profit: '+195 PIPS',
-    category: 'FOREX',
-    provider: 'London Core'
-  }
-];
+import { stateService } from '../lib/stateService';
 
 const chartData = [
   { time: '00:00', value: 2100 },
@@ -100,11 +37,19 @@ const chartData = [
 
 export default function Signals() {
   const [filter, setFilter] = useState('ALL');
-  const [activeSignal, setActiveSignal] = useState(SIGNAL_DATA[0]);
+  const signalsList = stateService.getSignals();
+  const [activeSignalId, setActiveSignalId] = useState<number | null>(null);
+
+  const currentActiveSignal = activeSignalId 
+    ? (signalsList.find(s => s.id === activeSignalId) || signalsList[0]) 
+    : signalsList[0];
+
+  const activeSignal = currentActiveSignal;
+  const setActiveSignal = (s: any) => setActiveSignalId(s.id);
 
   const filteredSignals = filter === 'ALL' 
-    ? SIGNAL_DATA 
-    : SIGNAL_DATA.filter(s => s.category === filter);
+    ? signalsList 
+    : signalsList.filter(s => s.category === filter);
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-6">

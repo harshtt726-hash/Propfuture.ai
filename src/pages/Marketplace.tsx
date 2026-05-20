@@ -19,73 +19,14 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../lib/utils';
-
-const PRODUCTS = [
-  { 
-    id: 1, 
-    name: 'Neural Edge Elite', 
-    firm: 'FTMO', 
-    price: '$155', 
-    oldPrice: '$210', 
-    discount: '30%', 
-    type: 'CHALLENGE_CODE', 
-    rating: 4.9, 
-    reviews: 124, 
-    rarity: 'Legendary',
-    stock: 5,
-    endsIn: '02:45:12',
-    image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop'
-  },
-  { 
-    id: 2, 
-    name: 'Quantum Scalper v4', 
-    firm: 'PropFutures', 
-    price: '$89', 
-    oldPrice: '$120', 
-    discount: '15%', 
-    type: 'SOFTWARE', 
-    rating: 4.8, 
-    reviews: 82, 
-    rarity: 'Elite',
-    stock: 12,
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop'
-  },
-  { 
-    id: 3, 
-    name: 'Apex $200k Node', 
-    firm: 'APEX', 
-    price: '$45', 
-    oldPrice: '$180', 
-    discount: '75%', 
-    type: 'CHALLENGE_CODE', 
-    rating: 4.7, 
-    reviews: 210, 
-    rarity: 'Common',
-    stock: 42,
-    endsIn: '08:12:45',
-    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2940&auto=format&fit=crop'
-  },
-  { 
-    id: 4, 
-    name: 'Nexus VIP Signal', 
-    firm: 'PropFutures', 
-    price: '$299', 
-    oldPrice: '$350', 
-    discount: 'Free Payout Access', 
-    type: 'SUBSCRIPTION', 
-    rating: 5.0, 
-    reviews: 45, 
-    rarity: 'Mythic',
-    stock: 2,
-    image: 'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?q=80&w=2832&auto=format&fit=crop'
-  }
-];
+import { stateService } from '../lib/stateService';
 
 export default function Marketplace() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
+  const productsList = stateService.getProducts();
 
-  const filteredProducts = PRODUCTS.filter(product => {
+  const filteredProducts = productsList.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) || 
                           product.firm.toLowerCase().includes(search.toLowerCase());
     

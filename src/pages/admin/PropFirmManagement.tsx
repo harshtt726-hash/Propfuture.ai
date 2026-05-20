@@ -22,19 +22,92 @@ import {
 import { cn } from '../../lib/utils';
 import ImageUpload from '../../components/ui/ImageUpload';
 
-const INITIAL_FIRMS = [
-  { id: 1, name: 'Apex Trader', category: 'Futures', discount: '20%', speed: 'Instant', trust: 9.8, status: 'Active', color: 'bg-blue-500' },
-  { id: 2, name: 'Funding Pips', category: 'Forex', discount: '15%', speed: '24h', trust: 9.5, status: 'Active', color: 'bg-emerald-500' },
-  { id: 3, name: 'FTMO', category: 'Forex', discount: '10%', speed: 'Same Day', trust: 9.9, status: 'Active', color: 'bg-indigo-500' },
-  { id: 4, name: 'Topstep', category: 'Futures', discount: '5%', speed: 'Instant', trust: 9.7, status: 'Active', color: 'bg-orange-500' },
-];
+import { stateService } from '../../lib/stateService';
 
 export default function PropFirmManagement() {
-  const [firms, setFirms] = useState(INITIAL_FIRMS);
+  const [firms, setFirms] = useState(() => stateService.getFirms());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFirm, setEditingFirm] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('identity');
   const [search, setSearch] = useState('');
+
+  const [formState, setFormState] = useState<any>({
+    name: '',
+    category: 'Futures',
+    discount: '10%',
+    speed: 'Instant',
+    trust: 9.5,
+    status: 'Active',
+    bio: '',
+    profitSplit: '90/10',
+    dailyDrawdown: '5%',
+    totalDrawdown: '10%',
+    phaseNodes: '1_PHASE_EVAL',
+    tradingPlatform: 'MT5',
+    restrictionsMatrix: 'No restrictions',
+    origin: 'USA',
+    verificationLevel: 'TIER_1_VERIFIED',
+    extractionCode: 'PROP_CODE_X',
+    featured: false,
+    trending: false,
+  });
+
+  const refreshFirmsList = () => {
+    setFirms(stateService.getFirms());
+  };
+
+  const startEditFirm = (firm: any) => {
+    setEditingFirm(firm);
+    setFormState({
+      id: firm.id,
+      name: firm.name,
+      category: firm.category || 'Futures',
+      discount: firm.discount || '10%',
+      speed: firm.speed || 'Instant',
+      trust: firm.trust || 9.5,
+      status: firm.status || 'Active',
+      bio: firm.bio || '',
+      profitSplit: firm.profitSplit || '85/15',
+      dailyDrawdown: firm.dailyDrawdown || '5%',
+      totalDrawdown: firm.totalDrawdown || '10%',
+      phaseNodes: firm.phaseNodes || '1_PHASE_EVAL',
+      tradingPlatform: firm.tradingPlatform || 'MT5, Rithmic',
+      restrictionsMatrix: firm.restrictionsMatrix || 'No restrictions',
+      origin: firm.origin || 'USA',
+      verificationLevel: firm.verificationLevel || 'TIER_1_VERIFIED',
+      extractionCode: firm.extractionCode || 'PROP_CODE_X',
+      featured: firm.featured || false,
+      trending: firm.trending || false,
+    });
+    setActiveTab('identity');
+    setIsModalOpen(true);
+  };
+
+  const startCreateFirm = () => {
+    setEditingFirm(null);
+    setFormState({
+      name: '',
+      category: 'Futures',
+      discount: '10%',
+      speed: 'Instant',
+      trust: 9.5,
+      status: 'Active',
+      bio: '',
+      profitSplit: '90/10',
+      dailyDrawdown: '5%',
+      totalDrawdown: '10%',
+      phaseNodes: '1_PHASE_EVAL',
+      tradingPlatform: 'MT5, Rithmic',
+      restrictionsMatrix: 'No restrictions',
+      origin: 'USA',
+      verificationLevel: 'TIER_1_VERIFIED',
+      extractionCode: 'PROP_CODE_X',
+      featured: false,
+      trending: false,
+    });
+    setActiveTab('identity');
+    setIsModalOpen(true);
+  };
 
   const filteredFirms = firms.filter(f => 
     f.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -50,18 +123,32 @@ export default function PropFirmManagement() {
   ];
 
   const handleToggleStatus = (id: number) => {
-    setFirms(firms.map(f => f.id === id ? { ...f, status: f.status === 'Active' ? 'Paused' : 'Active' } : f));
+    const target = firms.find(f => f.id === id);
+    if (target) {
+      const nextStatus = target.status === 'Active' ? 'Paused' : 'Active';
+      stateService.saveFirm({ ...target, status: nextStatus, active: nextStatus === 'Active' });
+      refreshFirmsList();
+    }
   };
 
   const handleSaveFirm = () => {
-    // Real logic would be here
+    if (!formState.name.trim()) {
+      alert('Firm Name is required!');
+      return;
+    }
+    stateService.saveFirm({
+      ...formState,
+      active: formState.status === 'Active'
+    });
     alert('Matrix synchronized successfully!');
     setIsModalOpen(false);
+    refreshFirmsList();
   };
 
   const handleDeleteFirm = (id: number) => {
     if (window.confirm('Terminate this protocol node? This action is irreversible across the matrix.')) {
-      setFirms(firms.filter(f => f.id !== id));
+      stateService.deleteFirm(id);
+      refreshFirmsList();
     }
   };
 
@@ -88,7 +175,7 @@ export default function PropFirmManagement() {
             />
           </div>
           <button 
-            onClick={() => { setEditingFirm(null); setIsModalOpen(true); }}
+            onClick={() => startCreateFirm()}
             className="px-8 py-4 bg-brand-neon text-black rounded-[24px] flex items-center justify-center gap-3 text-xs font-black neon-glow hover:scale-[1.02] transition-all uppercase tracking-widest italic"
           >
             <Plus size={18} /> Initialize New Node
@@ -129,7 +216,7 @@ export default function PropFirmManagement() {
                      </div>
                   </div>
                   <div className="flex gap-2">
-                     <button className="p-4 glass rounded-2xl hover:bg-white/10 transition-colors border-white/5" onClick={() => { setEditingFirm(firm); setIsModalOpen(true); }}><Settings size={18} /></button>
+                     <button className="p-4 glass rounded-2xl hover:bg-white/10 transition-colors border-white/5" onClick={() => startEditFirm(firm)}><Settings size={18} /></button>
                      <button className="p-4 glass rounded-2xl hover:bg-red-500/10 hover:text-red-500 transition-colors border-white/5" onClick={() => handleDeleteFirm(firm.id)}><Trash2 size={18} /></button>
                   </div>
                </div>
@@ -251,14 +338,15 @@ export default function PropFirmManagement() {
                                           <label className="text-[10px] uppercase font-black text-brand-neon tracking-[0.3em] px-1 italic">Firm Global Name</label>
                                           <input 
                                             type="text" 
-                                            defaultValue={editingFirm?.name}
+                                            value={formState.name}
+                                             onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono text-sm tracking-widest italic uppercase"
                                             placeholder="e.g. APEX_PROTOCOL"
                                           />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Asset Logic Category</label>
-                                          <select className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono text-sm uppercase tracking-widest appearance-none cursor-pointer">
+                                          <select value={formState.category} onChange={(e) => setFormState({ ...formState, category: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono text-sm uppercase tracking-widest appearance-none cursor-pointer">
                                              <option>Futures_Cluster</option>
                                              <option>Forex_Bridge</option>
                                              <option>Crypto_Network</option>
@@ -268,6 +356,8 @@ export default function PropFirmManagement() {
                                     <div className="space-y-2">
                                        <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Protocol Overview (Bio)</label>
                                        <textarea 
+                                         value={formState.bio || ''}
+                                         onChange={(e) => setFormState({ ...formState, bio: e.target.value })}
                                          className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 px-6 focus:outline-none focus:border-brand-neon font-medium text-sm min-h-[150px] resize-none"
                                          placeholder="Enter enterprise description here..."
                                        />
@@ -275,18 +365,18 @@ export default function PropFirmManagement() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Trust Score</label>
-                                          <input type="number" step="0.1" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="9.8" />
+                                          <input type="number" step="0.1" value={formState.trust || ''} onChange={(e) => setFormState({ ...formState, trust: parseFloat(e.target.value) || 0 })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="9.8" />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Verification Level</label>
-                                          <select className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono uppercase text-xs">
+                                          <select value={formState.verificationLevel || 'TIER_1_VERIFIED'} onChange={(e) => setFormState({ ...formState, verificationLevel: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono uppercase text-xs">
                                              <option>TIER_1_VERIFIED</option>
                                              <option>PENDING_AUDIT</option>
                                           </select>
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Company Origin</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="USA" />
+                                          <input type="text" value={formState.origin || ''} onChange={(e) => setFormState({ ...formState, origin: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="USA" />
                                        </div>
                                     </div>
                                  </div>
@@ -299,7 +389,8 @@ export default function PropFirmManagement() {
                                           <label className="text-[10px] uppercase font-black text-brand-neon tracking-[0.3em] px-1 italic">Affiliate Referral Payout</label>
                                           <input 
                                             type="text" 
-                                            defaultValue={editingFirm?.discount}
+                                            value={formState.discount || ''}
+                                            onChange={(e) => setFormState({ ...formState, discount: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono"
                                             placeholder="e.g. 15%"
                                           />
@@ -308,7 +399,8 @@ export default function PropFirmManagement() {
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Extraction (Payout) Speed</label>
                                           <input 
                                             type="text" 
-                                            defaultValue={editingFirm?.speed}
+                                            value={formState.speed || ''}
+                                            onChange={(e) => setFormState({ ...formState, speed: e.target.value })}
                                             className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono"
                                             placeholder="e.g. 24_HOURS"
                                           />
@@ -317,11 +409,11 @@ export default function PropFirmManagement() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Coupon Code</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-black italic tracking-widest text-brand-neon uppercase" placeholder="PROP_50" />
+                                          <input type="text" value={formState.extractionCode || ''} onChange={(e) => setFormState({ ...formState, extractionCode: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-black italic tracking-widest text-brand-neon uppercase" placeholder="PROP_50" />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Discount Value</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="50%" />
+                                          <input type="text" value={formState.discount || ''} onChange={(e) => setFormState({ ...formState, discount: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="50%" />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Countdown End</label>
@@ -370,21 +462,21 @@ export default function PropFirmManagement() {
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Profit Split</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="90/10" />
+                                          <input type="text" value={formState.profitSplit || ''} onChange={(e) => setFormState({ ...formState, profitSplit: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="90/10" />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Daily Drawdown</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="5%" />
+                                          <input type="text" value={formState.dailyDrawdown || ''} onChange={(e) => setFormState({ ...formState, dailyDrawdown: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="5%" />
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Total Drawdown</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="10%" />
+                                          <input type="text" value={formState.totalDrawdown || ''} onChange={(e) => setFormState({ ...formState, totalDrawdown: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="10%" />
                                        </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Phase Nodes</label>
-                                          <select className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono uppercase tracking-widest text-xs">
+                                          <select value={formState.phaseNodes || '1_PHASE_EVAL'} onChange={(e) => setFormState({ ...formState, phaseNodes: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono uppercase tracking-widest text-xs">
                                              <option>1_PHASE_EVAL</option>
                                              <option>2_PHASE_DELTA</option>
                                              <option>INSTANT_FUNDED</option>
@@ -392,12 +484,12 @@ export default function PropFirmManagement() {
                                        </div>
                                        <div className="space-y-2">
                                           <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Trading Platform</label>
-                                          <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="MT5, Rithmic" />
+                                          <input type="text" value={formState.tradingPlatform || ''} onChange={(e) => setFormState({ ...formState, tradingPlatform: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="MT5, Rithmic" />
                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                        <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Restrictions Matrix</label>
-                                       <input type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="No HFT, No News Trading" />
+                                       <input type="text" value={formState.restrictionsMatrix || ''} onChange={(e) => setFormState({ ...formState, restrictionsMatrix: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="No HFT, No News Trading" />
                                     </div>
                                  </div>
                               )}
@@ -408,11 +500,11 @@ export default function PropFirmManagement() {
                                        <div className="p-8 rounded-[40px] bg-white/[0.02] border border-white/5 space-y-6">
                                           <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 italic">Global Status Flags</h4>
                                           <div className="space-y-4">
-                                             {['Featured_Matrix', 'Trending_Protocol', 'Show_Reviews', 'Show_Payouts'].map((flag, k) => (
+                                             {[{ label: 'Featured Machine Node', key: 'featured' }, { label: 'Trending Protocol Delta', key: 'trending' }].map((flagObj, k) => (
                                                 <div key={k} className="flex justify-between items-center">
-                                                   <span className="text-[11px] font-bold text-white/60 tracking-wider font-mono">{flag}</span>
-                                                   <div className="w-10 h-5 bg-white/5 rounded-full p-1 cursor-pointer">
-                                                      <div className="w-3 h-3 bg-brand-neon rounded-full shadow-[0_0_10px_rgba(198,255,0,0.5)]" />
+                                                   <span className="text-[11px] font-bold text-white/60 tracking-wider font-mono">{flagObj.label}</span>
+                                                   <div onClick={() => setFormState({ ...formState, [flagObj.key]: !formState[flagObj.key] })} className="w-10 h-5 bg-white/5 rounded-full p-1 cursor-pointer flex items-center">
+                                                      <div className={cn("w-3 h-3 rounded-full transition-all", formState[flagObj.key] ? "translate-x-5 bg-brand-neon shadow-[0_0_10px_rgba(198,255,0,0.5)]" : "bg-white/20")} />
                                                    </div>
                                                 </div>
                                              ))}
@@ -423,14 +515,14 @@ export default function PropFirmManagement() {
                                               <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Categorization Cluster</label>
                                               <div className="flex flex-wrap gap-2">
                                                  {['Forex', 'Futures', 'Swing', 'Aggressive'].map(tag => (
-                                                   <button key={tag} className="px-5 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-bold uppercase tracking-widest text-white/40 hover:text-brand-neon hover:border-brand-neon/30 transition-all">{tag}</button>
+                                                   <button key={tag} type="button" onClick={() => setFormState({ ...formState, category: tag })} className={cn("px-5 py-2 border rounded-xl text-[9px] font-bold uppercase tracking-widest transition-all", formState.category === tag ? "bg-brand-neon text-black border-brand-neon" : "bg-white/5 border-white/10 text-white/40 hover:text-white")}>{tag}</button>
                                                  ))}
                                                  <button className="px-5 py-2 bg-brand-neon/10 border border-brand-neon/30 rounded-xl text-[9px] font-black uppercase text-brand-neon">+ ADD</button>
                                               </div>
                                            </div>
                                            <div className="space-y-2">
                                               <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">System Admin Note</label>
-                                              <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-medium text-xs h-32 resize-none" placeholder="Internal notes for this partner..." />
+                                              <textarea value={formState.adminNote || ''} onChange={(e) => setFormState({ ...formState, adminNote: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-medium text-xs h-32 resize-none" placeholder="Internal notes for this partner..." />
                                            </div>
                                        </div>
                                     </div>
