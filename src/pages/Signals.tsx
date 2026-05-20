@@ -122,7 +122,7 @@ export default function Signals() {
             <h1 className="text-6xl md:text-8xl font-display font-bold uppercase italic tracking-tighter leading-[0.8] mb-8">
               Extraction <br /> <span className="text-brand-neon text-glow-neon">Signals.</span>
             </h1>
-            <p className="text-xl text-white/40 font-medium italic max-w-xl">
+            <p className="text-xl text-white/50 font-medium italic max-w-xl">
               Real-time deep-learning algorithmic stream from the PropFutures neural layer. Synchronize your endpoints with hyper-liquidity nodes.
             </p>
           </motion.div>

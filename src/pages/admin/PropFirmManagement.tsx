@@ -20,6 +20,7 @@ import {
   Layers
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import ImageUpload from '../../components/ui/ImageUpload';
 
 const INITIAL_FIRMS = [
   { id: 1, name: 'Apex Trader', category: 'Futures', discount: '20%', speed: 'Instant', trust: 9.8, status: 'Active', color: 'bg-blue-500' },
@@ -33,6 +34,12 @@ export default function PropFirmManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFirm, setEditingFirm] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('identity');
+  const [search, setSearch] = useState('');
+
+  const filteredFirms = firms.filter(f => 
+    f.name.toLowerCase().includes(search.toLowerCase()) || 
+    f.category.toLowerCase().includes(search.toLowerCase())
+  );
 
   const tabs = [
     { id: 'identity', label: 'Identity', icon: User },
@@ -69,17 +76,29 @@ export default function PropFirmManagement() {
            <h1 className="text-4xl md:text-5xl font-display font-bold uppercase italic tracking-tighter">Partner <span className="text-brand-neon">Nexus</span></h1>
            <p className="text-[11px] text-white/30 font-bold uppercase tracking-[0.3em] mt-2">Manage prop firm synchronization and extraction rules</p>
         </div>
-        <button 
-          onClick={() => { setEditingFirm(null); setIsModalOpen(true); }}
-          className="px-8 py-4 bg-brand-neon text-black rounded-[24px] flex items-center gap-3 text-xs font-black neon-glow hover:scale-[1.02] transition-all uppercase tracking-widest italic"
-        >
-          <Plus size={18} /> Initialize New Node
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <div className="relative group flex-grow sm:flex-grow-0">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-brand-neon transition-colors" size={16} />
+            <input 
+              type="text" 
+              placeholder="FILTER_NODES..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full sm:w-64 bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-6 focus:outline-none focus:border-brand-neon font-mono text-[10px] uppercase tracking-widest text-brand-neon placeholder:text-white/20"
+            />
+          </div>
+          <button 
+            onClick={() => { setEditingFirm(null); setIsModalOpen(true); }}
+            className="px-8 py-4 bg-brand-neon text-black rounded-[24px] flex items-center justify-center gap-3 text-xs font-black neon-glow hover:scale-[1.02] transition-all uppercase tracking-widest italic"
+          >
+            <Plus size={18} /> Initialize New Node
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence>
-          {firms.map((firm) => (
+          {filteredFirms.map((firm) => (
             <motion.div 
               layout
               key={firm.id}
@@ -187,7 +206,7 @@ export default function PropFirmManagement() {
                   <div className="w-full md:w-80 border-r border-white/5 p-10 bg-black/40 flex flex-col h-full overflow-y-auto">
                      <div className="mb-12">
                         <h2 className="text-3xl font-display font-bold uppercase italic tracking-tighter leading-none mb-2">Protocol <br /> <span className="text-brand-neon">Editor</span></h2>
-                        <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest italic whitespace-nowrap">Configure global delta parameters</p>
+                        <p className="text-[10px] text-white/50 font-bold uppercase tracking-widest italic whitespace-nowrap">Configure global delta parameters</p>
                      </div>
                      <div className="space-y-2 flex-grow">
                         {tabs.map((tab) => (
@@ -238,7 +257,7 @@ export default function PropFirmManagement() {
                                           />
                                        </div>
                                        <div className="space-y-2">
-                                          <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Asset Logic Category</label>
+                                          <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Asset Logic Category</label>
                                           <select className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 focus:outline-none focus:border-brand-neon font-mono text-sm uppercase tracking-widest appearance-none cursor-pointer">
                                              <option>Futures_Cluster</option>
                                              <option>Forex_Bridge</option>
@@ -247,7 +266,7 @@ export default function PropFirmManagement() {
                                        </div>
                                     </div>
                                     <div className="space-y-2">
-                                       <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Protocol Overview (Bio)</label>
+                                       <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Protocol Overview (Bio)</label>
                                        <textarea 
                                          className="w-full bg-white/5 border border-white/10 rounded-3xl py-5 px-6 focus:outline-none focus:border-brand-neon font-medium text-sm min-h-[150px] resize-none"
                                          placeholder="Enter enterprise description here..."
@@ -255,11 +274,11 @@ export default function PropFirmManagement() {
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                        <div className="space-y-2">
-                                          <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Trust Score</label>
+                                          <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Trust Score</label>
                                           <input type="number" step="0.1" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono" placeholder="9.8" />
                                        </div>
                                        <div className="space-y-2">
-                                          <label className="text-[10px] uppercase font-black text-white/30 tracking-[0.3em] px-1 italic">Verification Level</label>
+                                          <label className="text-[10px] uppercase font-black text-white/50 tracking-[0.3em] px-1 italic">Verification Level</label>
                                           <select className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-brand-neon font-mono uppercase text-xs">
                                              <option>TIER_1_VERIFIED</option>
                                              <option>PENDING_AUDIT</option>
@@ -326,6 +345,22 @@ export default function PropFirmManagement() {
                                             </div>
                                           ))}
                                        </div>
+                                    </div>
+                                 </div>
+                              )}
+
+                              {activeTab === 'media' && (
+                                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                       <ImageUpload label="Primary Branding (Logo)" />
+                                       <ImageUpload label="Hero Coverage (Cover)" />
+                                    </div>
+                                    <div className="p-8 rounded-[36px] bg-brand-neon/[0.03] border border-brand-neon/10 flex items-center justify-between">
+                                       <div>
+                                          <div className="text-[10px] font-black uppercase text-brand-neon mb-1 italic">Media_Node_Sync</div>
+                                          <p className="text-[9px] text-white/30 uppercase font-bold">Synchronizing assets with global CDN layers.</p>
+                                       </div>
+                                       <Zap size={24} className="text-brand-neon opacity-20" />
                                     </div>
                                  </div>
                               )}

@@ -85,6 +85,18 @@ export default function Marketplace() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
 
+  const filteredProducts = PRODUCTS.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) || 
+                          product.firm.toLowerCase().includes(search.toLowerCase());
+    
+    if (filter === 'All') return matchesSearch;
+    if (filter === 'Challenges') return matchesSearch && product.type === 'CHALLENGE_CODE';
+    if (filter === 'Software') return matchesSearch && product.type === 'SOFTWARE';
+    if (filter === 'Elite') return matchesSearch && (product.rarity === 'Legendary' || product.rarity === 'Mythic' || product.rarity === 'Elite');
+    
+    return matchesSearch;
+  });
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -114,7 +126,7 @@ export default function Marketplace() {
                </div>
                <div className="glass p-5 rounded-3xl border-white/5 bg-black/40 text-center min-w-[120px]">
                   <div className="text-[9px] text-white/30 font-bold uppercase tracking-widest mb-1">LIVE_DEALS</div>
-                  <div className="text-2xl font-mono font-bold text-brand-neon">42</div>
+                  <div className="text-2xl font-mono font-bold text-brand-neon">{filteredProducts.length}</div>
                </div>
             </div>
          </div>
@@ -140,7 +152,7 @@ export default function Marketplace() {
                 onClick={() => setFilter(cat)}
                 className={cn(
                   "px-8 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all",
-                  filter === cat ? "bg-brand-neon text-black neon-glow" : "text-white/30 hover:text-white"
+                  filter === cat ? "bg-brand-neon text-black neon-glow font-black italic" : "text-white/30 hover:text-white"
                 )}
               >
                 {cat}
@@ -151,7 +163,7 @@ export default function Marketplace() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-         {PRODUCTS.map((product, i) => (
+         {filteredProducts.map((product, i) => (
            <motion.div 
              key={product.id}
              initial={{ opacity: 0, y: 30 }}

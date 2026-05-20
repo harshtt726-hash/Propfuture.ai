@@ -42,9 +42,9 @@ const StatCard = ({ title, value, sub, trend, isUp, icon: Icon }: any) => (
          {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {trend}%
        </div>
     </div>
-    <div className="text-[9px] uppercase text-white/30 tracking-[0.3em] font-bold mb-2">{title}</div>
+    <div className="text-[9px] uppercase text-white/40 tracking-[0.3em] font-bold mb-2">{title}</div>
     <div className="text-4xl font-display font-bold mb-2 uppercase italic tracking-tighter">{value}</div>
-    <div className="text-[10px] text-white/20 font-bold uppercase tracking-widest leading-none">{sub}</div>
+    <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest leading-none">{sub}</div>
   </div>
 );
 
@@ -178,7 +178,7 @@ export default function AdminDashboard() {
              <div className="overflow-x-auto">
                <table className="w-full text-left">
                   <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.3em] text-white/20 border-b border-white/5">
+                    <tr className="text-[9px] uppercase tracking-[0.3em] text-white/40 border-b border-white/5">
                       <th className="pb-6 font-bold mr-4">Node Profile</th>
                       <th className="pb-6 font-bold">Extraction Qty</th>
                       <th className="pb-6 font-bold">Net Alpha</th>
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
                     ].map((firm, i) => (
                       <tr key={i} className="group hover:bg-white/[0.02] transition-colors border-b border-white/[0.02] last:border-0">
                         <td className="py-6 font-bold uppercase italic tracking-tighter text-lg">{firm.name}</td>
-                        <td className="py-6 font-mono text-xs text-white/40">{firm.sold.toLocaleString()}</td>
+                        <td className="py-6 font-mono text-xs text-white/50">{firm.sold.toLocaleString()}</td>
                         <td className="py-6 font-mono text-xs text-brand-neon">{firm.roi}</td>
                         <td className="py-6">
                            <div className={cn("text-[9px] font-bold uppercase tracking-widest flex items-center gap-2", firm.color)}>

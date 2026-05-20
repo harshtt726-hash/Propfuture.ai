@@ -58,7 +58,7 @@ const StatsSection = () => {
               <stat.icon size={24} />
             </div>
             <div className="text-3xl font-display font-bold mb-1 tracking-tighter">{stat.value}</div>
-            <div className="text-[10px] text-white/30 font-bold uppercase tracking-[0.2em]">{stat.label}</div>
+            <div className="text-[10px] text-white/50 font-bold uppercase tracking-[0.2em]">{stat.label}</div>
           </motion.div>
         ))}
       </div>
@@ -75,7 +75,7 @@ const SignalCard = ({ pair, entry, sl, tp, winRate, time }: any) => (
         </div>
         <div>
           <div className="text-sm font-bold">{pair}</div>
-          <div className="text-[10px] text-white/30 uppercase tracking-widest">{time}</div>
+          <div className="text-[10px] text-white/50 uppercase tracking-widest">{time}</div>
         </div>
       </div>
       <div className="px-3 py-1 rounded-full bg-brand-neon/20 text-brand-neon text-[10px] font-bold border border-brand-neon/30">
@@ -85,15 +85,15 @@ const SignalCard = ({ pair, entry, sl, tp, winRate, time }: any) => (
     
     <div className="grid grid-cols-3 gap-4 mb-6">
       <div className="text-center">
-        <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">Entry</div>
+        <div className="text-[10px] text-white/50 uppercase font-bold tracking-widest mb-1">Entry</div>
         <div className="text-xs font-mono font-bold text-white">{entry}</div>
       </div>
       <div className="text-center">
-        <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">SL</div>
+        <div className="text-[10px] text-white/50 uppercase font-bold tracking-widest mb-1">SL</div>
         <div className="text-xs font-mono font-bold text-red-500/80">{sl}</div>
       </div>
       <div className="text-center">
-        <div className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-1">TP</div>
+        <div className="text-[10px] text-white/50 uppercase font-bold tracking-widest mb-1">TP</div>
         <div className="text-xs font-mono font-bold text-brand-neon">{tp}</div>
       </div>
     </div>
@@ -145,11 +145,11 @@ const FundedShowcase = () => {
                   <div className="font-bold flex items-center gap-2">
                     {t.name} <Crown size={12} className="text-brand-neon" />
                   </div>
-                  <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{t.firm}</div>
+              <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{t.firm}</div>
                 </div>
               </div>
               <div className="text-2xl font-mono font-bold text-brand-neon mb-1">{t.profit}</div>
-              <div className="text-[10px] text-white/30 font-bold uppercase tracking-widest">REAL PAYOUT • {t.payoutDate}</div>
+              <div className="text-[10px] text-white/50 font-bold uppercase tracking-widest">REAL PAYOUT • {t.payoutDate}</div>
               <div className="mt-6 pt-6 border-t border-white/5 flex gap-2">
                  <div className="px-2 py-1 bg-white/5 rounded text-[8px] font-bold uppercase tracking-tighter text-white/40">Verified OnChain</div>
                  <div className="px-2 py-1 bg-brand-neon/10 rounded text-[8px] font-bold uppercase tracking-tighter text-brand-neon">Elite Badge</div>

@@ -91,8 +91,8 @@ const Navbar = () => {
 
   return (
     <nav className={cn(
-      "fixed top-8 left-0 right-0 z-50 transition-all duration-500 px-6",
-      isScrolled ? "top-4" : ""
+      "fixed top-14 left-0 right-0 z-50 transition-all duration-500 px-6",
+      isScrolled ? "top-10" : ""
     )}>
       <div className={cn(
         "max-w-[1400px] mx-auto flex items-center justify-between px-8 py-3 rounded-[24px] transition-all duration-500 relative group",
@@ -263,7 +263,15 @@ const Footer = () => (
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col selection:bg-brand-neon/30 selection:text-brand-neon font-sans">
+      <div className="min-h-screen flex flex-col selection:bg-brand-neon/30 selection:text-brand-neon font-sans bg-[#020202] relative overflow-x-hidden">
+        {/* Cinematic Global Background */}
+        <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-neon/5 blur-[120px] rounded-full animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand-cyan/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(198,255,0,0.01)_0%,_transparent_50%)]" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+        </div>
+        
         <BackgroundEcosystem />
         <AIAssistant />
         <Routes>
